@@ -27,6 +27,8 @@
             width: 100%;
             max-width: 420px;
             text-align: center;
+            position: relative;
+            z-index: 1; /* Garante que a UI principal fique acima */
         }
 
         .logo {
@@ -109,25 +111,18 @@
             min-height: 20px;
         }
 
-    /* Imagem (escondida no início) */
-#conteudo {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    
-    /* Ajuste o tamanho desejado para a imagem/bloco */
-    width: auto; 
-    height: auto;
-    
-    background: #000;
-    z-index: -1; /* Coloca abaixo de todas as outras camadas */
-}
-
-        }
-
-     
+        /* Texto fixo no meio da tela e atrás de tudo */
+        .erro-fundo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1; /* Coloca abaixo de todas as camadas */
+            color: #444; /* Cor sutil para o fundo */
+            font-size: 32px;
+            font-weight: 700;
+            pointer-events: none; /* Impede que interfira em cliques */
+            user-select: none;
         }
     </style>
 </head>
@@ -147,10 +142,14 @@
         </div>
     </div>
 
-    <!-- Conteúdo liberado depois da permissão -->
-    <div>
-        error 404 
+    <!-- Conteúdo fixo no fundo -->
+    <div class="erro-fundo">
+        error 404
     </div>
+
+</body>
+</html>
+
        
 
     <script>
