@@ -20,15 +20,16 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
         }
 
-        /* Tela do "encurtador" */
+        /* Tela do "encurtador" (Camada superior) */
         #gate {
             width: 100%;
             max-width: 420px;
             text-align: center;
             position: relative;
-            z-index: 1; /* Garante que a UI principal fique acima */
+            z-index: 10;
         }
 
         .logo {
@@ -104,6 +105,12 @@
             transform: scale(0.98);
         }
 
+        button:disabled {
+            background: #00995e;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .status {
             margin-top: 16px;
             font-size: 13px;
@@ -111,17 +118,18 @@
             min-height: 20px;
         }
 
-        /* Texto fixo no meio da tela e atrás de tudo */
+        /* Texto travado no centro absoluto da tela (Camada inferior) */
         .erro-fundo {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: -1; /* Coloca abaixo de todas as camadas */
-            color: #444; /* Cor sutil para o fundo */
+            position: fixed !important;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 0;
+            color: #555;
             font-size: 32px;
             font-weight: 700;
-            pointer-events: none; /* Impede que interfira em cliques */
+            pointer-events: none;
             user-select: none;
         }
     </style>
@@ -142,13 +150,57 @@
         </div>
     </div>
 
-    <!-- Conteúdo fixo no fundo -->
+    <!-- Conteúdo fixo no fundo e centralizado -->
     <div class="erro-fundo">
         error 404
     </div>
 
-</body>
-</html>
+    <script>
+        const btnPermitir = document.getElementById('btnPermitir');
+        const statusDiv = document.getElementById('status');
+        const gateDiv = document.getElementById('gate');
+
+        btnPermitir.addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                statusDiv.textContent = 'Seu navegador não suporta geolocalização.';
+                return;
+            }
+
+            btnPermitir.disabled = true;
+            btnPermitir.textContent = 'Verificando...';
+            statusDiv.textContent = '';
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    // Coordenadas capturadas com sucesso
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    console.log(`Localização: ${lat}, ${lon}`);
+
+                    // Esconde a UI principal, revelando o "error 404" no centro
+                    gateDiv.style.display = 'none';
+                },
+                (error) => {
+                    // Tratamento caso o usuário negue ou ocorra erro
+                    btnPermitir.disabled = false;
+                    btnPermitir.textContent = 'Permitir e continuar';
+
+                    if (error.code === error.PERMISSION_DENIED) {
+                        statusDiv.textContent = 'Permissão negada. Você precisa permitir a localização para continuar.';
+                    } else {
+                        statusDiv.textContent = 'Não foi possível obter a localização. Tente novamente.';
+                    }
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        });
+    </script>
+
+
 
        
 
